@@ -1,0 +1,108 @@
+NAME
+    Config::Simple::App - Perl extension for managing application's
+    configuration settings
+
+SYNOPSIS
+        # inside App/Config.pm
+        package App::Config;
+        use base qw( Config::Simple::App );
+
+        sub _init {
+            my $self = shift;
+
+            $self->define("AppPath", "/home/sherzodr/public_html/author/");
+            $self->define("AppURL", "http://author.handalak.com/");
+            $self->define("CGIPath", $self->AppURL . "cgi-bin/" );
+            $self->define("DBDriver");
+            $self->define("DBName");
+            $self->define("DBUser");
+            $self->define("DBPassword");
+            $self->define("DBPath", $self->AppPath . "db/");
+
+        }
+
+        1;
+
+        __END__;
+
+        # in your application:
+        $config = new App::Config("config.ini");
+        print $config->AppPath();
+        # etc..
+
+ABSTRACT
+        Config::Simple::App is meant to be sub classed by applications' 
+        configuration manager class. Relies on Config::Simple to parse
+        configuration files into configuration manager instance.
+
+DESCRIPTION
+    One can, of course, use Config::Simple to manage their applications'
+    configuration files. Although perfect for reading and writing
+    configuration files of various formats, Config::Simple does not provide
+    obvious ways for validating configuration file's attributes and for
+    assigning default attribute values.
+
+    Is that such a big deal? Consider the following:
+
+    *   Most applications rely on predefined configuration attributes.
+
+    *   More often than not configuration files consist of attributes that
+        are rarely modified, but read frequently.
+
+    *   All configuration attributes should not be required to be set
+        explicitly. Applications must be able to derive default values for
+        missing attributes, possibly by looking at other attributes.
+
+    *   Typos in configuration files must be detected as early as possible.
+        Complex validation routines may be required to validate certain
+        settings (such as a path that doesn't exist, but should).
+
+    *   Name based access is sometimes preferred
+
+    Config::Simple::App attempts to deliver all the above features to your
+    application
+
+  EXPORT
+    None.
+
+PROGRAMMING STYLE
+    Config::Simple::App is not meant to be used directly, but through sub
+    classing.
+
+    First step in creating a configuration manager class is to subclass
+    Config::Simple::App.
+
+        package App::ConfigManager;
+        use base qw( Config::Simple::App );
+
+    Config::Simple::App provides new() and define() methods to your
+    configuration class. The next step is to define an "_init()" routine
+    that gets called by new() after configuration file has been processed.
+    You need to call define() for each attribute that a configuration file
+    can have that is considered valid. This does not mean all those
+    attributes must be present, but can be present.
+
+        sub _init {
+            my $self = shift;
+
+            $self->define("Path");
+            $self->define("TemplatePath", $self->Path . 'tmpl');
+        }
+
+METHODS
+    new($config_file)
+    define($attribute)
+    define($attribute, $default_value)
+
+SEE ALSO
+    Config::Simple
+
+AUTHOR
+    Sherzod B. Ruzmetov <sherzodr@localdomain>
+
+COPYRIGHT AND LICENSE
+    Copyright 2005 by Sherzod B. Ruzmetov
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
